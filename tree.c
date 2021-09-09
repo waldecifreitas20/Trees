@@ -204,4 +204,6 @@ void maxAndMin(Tree* t) {
     printf("Menor valor: %d\n", min(t));
 }
 
-void drawTree(Tree* t);
+void drawTree(Tree* t) {
+    
+}
