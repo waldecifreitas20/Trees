@@ -19,26 +19,44 @@ void showTree(Tree* t);
 //Extra
 int doubleNode(Tree* t); //
 int countLeafs(Tree* t, int value);//
-int howDeepIs(Tree* t);
-void maxAndMin(Tree* t);
+int howDeepIs(Tree* t);//
+void maxAndMin(Tree* t);//
 void drawTree(Tree* t);
 //Aux
 Tree* initTree();
 void setValues(Tree** t);
+
+int removeFirst(Tree** t, int value) {
+    int found = 0;
+    if ((*t)->left == NULL && (*t)->right == NULL && (*t)->value == value) {
+        free(*t);
+        *t = NULL;
+        found = 1;
+    } else {
+        if ((*t)->left != NULL) {
+            found = removeFirst(&(*t)->left, value);
+        }        
+        if (!found && (*t)->right != NULL) {
+            found = removeFirst(&(*t)->right, value);
+        }        
+    }    
+    return found;
+}
 
 
 int main() {
     Tree* t = initTree();
     int r = 0;
     setValues(&t);
-   /*
-    showTree(t);
-    if(!search(t, 25)) {
+   
+   /*  if(!search(t, 198)) {
         printf("elemento nao encontrado!\n");
-    }
-   */
-    maxAndMin(t);
+    } */
+   // removeLeaf(&t, 1);
+    int f = removeFirst(&t, 198);
 
+    maxAndMin(t);
+    showTree(t);
     return 0;
 }
 
@@ -87,6 +105,22 @@ int min(Tree* t) {
     return min(t->left);    
 }
 
+void removeLeaf(Tree** t, int value) {
+    if ((*t)->value == value) {
+        *t = NULL;
+        t = NULL;
+        free(*t);
+        free(t);
+        puts("acheui\n\n");
+    } else {
+        if (value < (*t)->value && (*t)->left != NULL) {
+            removeLeaf((*t)->left, value);
+        } else if(value > (*t)->value && (*t)->right != NULL){
+            removeLeaf((*t)->right, value);
+        } 
+    }
+}
+
 //Required
 void addLeaf(Tree** t, int value) {
     Tree* node = newNode(value);
@@ -119,7 +153,7 @@ void addLeaf(Tree** t, int value) {
     }    
 }
 
-void removeLeaf(Tree** t, int value);
+void removeTree(Tree** t);
 
 int search(Tree* t, int value) {
     int aafolou = 0, left = 0, right = 0;
