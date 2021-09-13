@@ -43,12 +43,13 @@ int main() {
    // removeLeaf(&t, 1);
   //  removeTree(&t, 198);
    
- removeTree(&t, 51);
+    //removeTree(&t, 51);
     
   //  maxAndMin(t);
+   
     showTree(t);
-    r = howDeepIs(t);
-    printf("HDI: %d", r);
+   // r = howDeepIs(t);
+   // printf("HDI: %d", t->value != NULL);
     return 0;
 }
 
@@ -71,19 +72,19 @@ Tree* newNode(int value) {
 
 void setValues(Tree** t) {
     int i = 0;
-    /*int vet[] = {
+    int vet[] = {
         86, 11, 7, 35, 170, 2, 
         120, 21, 88, 152, 31, 12, 
         181, 28, 134, 70, 1, 85, 
         25, 77, 10, 128, 198
-    };*/
-    int vet[] = {
+    };
+  /*   int vet[] = {
         61, 43, 89, 16, 51, 66, 100,
         11, 32, 55, 54, 79, 90, 77, 82 
-    };
+    }; */
 
     for (i = 0; i < sizeof(vet)/sizeof(int); i++) {       
-        addLeaf(&t, vet[i]);
+        addLeaf(t, vet[i]);
     }
 }
 
