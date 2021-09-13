@@ -4,6 +4,9 @@
 #define _HEAD_ "RAIZ"
 #define _LEFT_ "ESQUERDA"
 #define _RIGHT_ "DIREITA"
+#define _DECREASE_ -1
+#define _INCREASE_ 1
+
 
 typedef struct _tree {
     struct _tree* left,* right,* father;
@@ -13,8 +16,8 @@ typedef struct _tree {
 
 //Required
 void addLeaf(Tree** t, int value);
-void removeLeaf(Tree** t, int value);
 int search(Tree* t, int value);
+void removeTree(Tree** t, int value);
 void showTree(Tree* t);
 //Extra
 int doubleNode(Tree* t); //
@@ -25,23 +28,8 @@ void drawTree(Tree* t);
 //Aux
 Tree* initTree();
 void setValues(Tree** t);
+void removeLeaf(Tree** t, int value);
 
-int removeFirst(Tree** t, int value) {
-    int found = 0;
-    if ((*t)->left == NULL && (*t)->right == NULL && (*t)->value == value) {
-        free(*t);
-        *t = NULL;
-        found = 1;
-    } else {
-        if ((*t)->left != NULL) {
-            found = removeFirst(&(*t)->left, value);
-        }        
-        if (!found && (*t)->right != NULL) {
-            found = removeFirst(&(*t)->right, value);
-        }        
-    }    
-    return found;
-}
 
 
 int main() {
@@ -53,28 +41,18 @@ int main() {
         printf("elemento nao encontrado!\n");
     } */
    // removeLeaf(&t, 1);
-    int f = removeFirst(&t, 198);
-
-    maxAndMin(t);
+  //  removeTree(&t, 198);
+   
+ removeTree(&t, 51);
+    
+  //  maxAndMin(t);
     showTree(t);
+    r = howDeepIs(t);
+    printf("HDI: %d", r);
     return 0;
 }
 
 //Aux
-void setValues(Tree** t) {
-    int i = 0;
-    int vet[] = {
-        86, 11, 7, 35, 170, 2, 
-        120, 21, 88, 152, 31, 12, 
-        181, 28, 134, 70, 1, 85, 
-        25, 77, 10, 128, 198
-    };
-    for (i = 0; i < sizeof(vet)/sizeof(int); i++) {       
-        addLeaf(&t, vet[i]);
-    }
-        printf("i = %d\n", sizeof(vet)/sizeof(int)); 
-}
-
 Tree* initTree() {
     Tree* t = (Tree*) malloc(sizeof(Tree));   
     t->father = NULL;
@@ -91,6 +69,24 @@ Tree* newNode(int value) {
     return node;
 }
 
+void setValues(Tree** t) {
+    int i = 0;
+    /*int vet[] = {
+        86, 11, 7, 35, 170, 2, 
+        120, 21, 88, 152, 31, 12, 
+        181, 28, 134, 70, 1, 85, 
+        25, 77, 10, 128, 198
+    };*/
+    int vet[] = {
+        61, 43, 89, 16, 51, 66, 100,
+        11, 32, 55, 54, 79, 90, 77, 82 
+    };
+
+    for (i = 0; i < sizeof(vet)/sizeof(int); i++) {       
+        addLeaf(&t, vet[i]);
+    }
+}
+
 int max(Tree* t) {
     if (t->right == NULL) {
         return t->value;
@@ -105,21 +101,38 @@ int min(Tree* t) {
     return min(t->left);    
 }
 
-void removeLeaf(Tree** t, int value) {
-    if ((*t)->value == value) {
-        *t = NULL;
-        t = NULL;
-        free(*t);
-        free(t);
-        puts("acheui\n\n");
-    } else {
-        if (value < (*t)->value && (*t)->left != NULL) {
-            removeLeaf((*t)->left, value);
-        } else if(value > (*t)->value && (*t)->right != NULL){
-            removeLeaf((*t)->right, value);
-        } 
+int howManyChildren(Tree* t) {
+    int children = 0;
+    if (t->left != NULL) {
+        ++children;
+    }
+    if (t->right != NULL) {
+        ++children;
+    }
+    return children;
+}
+
+Tree* getSubstituteNode(Tree* t) {
+  //  printf("if %d\n", t == NULL);
+    if (t->left == NULL)
+        return t;
+    return getSubstituteNode(t->left);    
+}
+
+void updateLevel(Tree** t, int action) {
+    (*t)->level += action;
+    printf("t = %d\n \n", (*t)->value);
+    if ((*t)->left != NULL && (*t)->right != NULL) {
+        printf("a = %d\n", (*t)->value);
+        if ((*t)->right != NULL) {
+            updateLevel(&(*t)->right, action);
+        }
+        if ((*t)->left != NULL) {
+            updateLevel(&(*t)->left, action);
+        }
     }
 }
+
 
 //Required
 void addLeaf(Tree** t, int value) {
@@ -153,7 +166,43 @@ void addLeaf(Tree** t, int value) {
     }    
 }
 
-void removeTree(Tree** t);
+void removeTree(Tree** t, int value) {
+    if ((*t)->value > value && (*t)->left != NULL) {
+        removeTree(&(*t)->left, value);
+    } else if((*t)->value < value && (*t)->right != NULL) {
+        removeTree(&(*t)->right, value);        
+    } else {
+        switch (howManyChildren(*t)) {
+            case 0:
+                free(*t);
+                *t = NULL;
+                break;
+            case 1:;
+                Tree* subs;
+                if ((*t)->left != NULL) {
+                    subs = (*t)->left;
+                } else {
+                    subs = (*t)->right;
+                }
+
+                updateLevel(&subs, _DECREASE_); 
+                Tree* father = (*t)->father;
+                if (father->left == (*t)) {
+                    father->left = subs;
+                } else {
+                    father->right = subs;
+                }                  
+                break;
+                
+            case 2:
+                puts("2");
+
+                break;            
+            default:
+                break;
+        }              
+    }       
+}
 
 int search(Tree* t, int value) {
     int aafolou = 0, left = 0, right = 0;
