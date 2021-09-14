@@ -43,7 +43,7 @@ int main() {
    // removeLeaf(&t, 1);
   //  removeTree(&t, 198);
    
-    //removeTree(&t, 51);
+ //   removeTree(&t, 66);
     
   //  maxAndMin(t);
    
@@ -72,16 +72,16 @@ Tree* newNode(int value) {
 
 void setValues(Tree** t) {
     int i = 0;
-    int vet[] = {
+    /* int vet[] = {
         86, 11, 7, 35, 170, 2, 
         120, 21, 88, 152, 31, 12, 
         181, 28, 134, 70, 1, 85, 
         25, 77, 10, 128, 198
-    };
-  /*   int vet[] = {
-        61, 43, 89, 16, 51, 66, 100,
-        11, 32, 55, 54, 79, 90, 77, 82 
     }; */
+    int vet[] = {
+        61, 43, 89, 16, 51, 66, 100,
+        11, 32, 55, 54, 79, 90, 82, 83 
+    };
 
     for (i = 0; i < sizeof(vet)/sizeof(int); i++) {       
         addLeaf(t, vet[i]);
@@ -122,16 +122,14 @@ Tree* getSubstituteNode(Tree* t) {
 
 void updateLevel(Tree** t, int action) {
     (*t)->level += action;
-    printf("t = %d\n \n", (*t)->value);
-    if ((*t)->left != NULL && (*t)->right != NULL) {
-        printf("a = %d\n", (*t)->value);
-        if ((*t)->right != NULL) {
-            updateLevel(&(*t)->right, action);
-        }
-        if ((*t)->left != NULL) {
-            updateLevel(&(*t)->left, action);
-        }
+    if ((*t)->left != NULL) {
+        updateLevel(&(*t)->left, action);
     }
+    if ((*t)->right != NULL) {
+        updateLevel(&(*t)->right, action);
+    }
+    
+    
 }
 
 
@@ -196,8 +194,7 @@ void removeTree(Tree** t, int value) {
                 break;
                 
             case 2:
-                puts("2");
-
+                
                 break;            
             default:
                 break;
