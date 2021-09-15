@@ -17,33 +17,25 @@ typedef struct _tree {
 //Required
 void addLeaf(Tree** t, int value);
 int search(Tree* t, int value);
-void removeTree(Tree** t, int value);
+void removeNode(Tree** t, int value);
 void showTree(Tree* t);
 //Extra
-int doubleNode(Tree* t); //
-int countLeafs(Tree* t, int value);//
-int howDeepIs(Tree* t);//
-void maxAndMin(Tree* t);//
+int doubleNode(Tree* t);
+int countLeafs(Tree* t, int value);
+int howDeepIs(Tree* t);
+void maxAndMin(Tree* t);
 void drawTree(Tree* t);
 //Aux
 Tree* initTree();
-void setValues(Tree** t);
-void removeLeaf(Tree** t, int value);
-
+void setValuesAtTree(Tree** t);
 
 
 int main() {
     Tree* t = initTree();
     int r = 0;
-    setValues(&t);
-   
-   /*  if(!search(t, 198)) {
-        printf("elemento nao encontrado!\n");
-    } */
-   // removeLeaf(&t, 1);
-  //  removeTree(&t, 198);
-   
- //   removeTree(&t, 66);
+    setValuesAtTree(&t);
+      
+    removeNode(&t, 61);
     
   //  maxAndMin(t);
    
@@ -69,23 +61,19 @@ Tree* newNode(int value) {
     node->value = value;    
     return node;
 }
-
-void setValues(Tree** t) {
+ 
+void setValuesAtTree(Tree** t) {
     int i = 0;
-    /* int vet[] = {
+    int vet[] = {
         86, 11, 7, 35, 170, 2, 
         120, 21, 88, 152, 31, 12, 
         181, 28, 134, 70, 1, 85, 
         25, 77, 10, 128, 198
-    }; */
-    int vet[] = {
-        61, 43, 89, 16, 51, 66, 100,
-        11, 32, 55, 54, 79, 90, 82, 83 
     };
-
     for (i = 0; i < sizeof(vet)/sizeof(int); i++) {       
         addLeaf(t, vet[i]);
     }
+
 }
 
 int max(Tree* t) {
@@ -114,7 +102,6 @@ int howManyChildren(Tree* t) {
 }
 
 Tree* getSubstituteNode(Tree* t) {
-  //  printf("if %d\n", t == NULL);
     if (t->left == NULL)
         return t;
     return getSubstituteNode(t->left);    
@@ -132,6 +119,50 @@ void updateLevel(Tree** t, int action) {
     
 }
 
+//
+void noChild(Tree** t) {
+    free(*t);
+    *t = NULL;
+}
+
+void oneChild(Tree** t) {
+    Tree* subs;
+    if ((*t)->left != NULL) {
+        subs = (*t)->left;
+    } else {
+        subs = (*t)->right;
+    }
+    updateLevel(&subs, _DECREASE_); 
+    Tree* father = (*t)->father;
+    if (father->left == (*t)) {
+        father->left = subs;
+    } else {
+        father->right = subs;
+    }
+    subs->father = father;
+}
+
+void twoChild(Tree** t) {
+    Tree* subs = getSubstituteNode((*t)->right);
+    (*t)->value = subs->value;
+    decide(&subs);    
+}
+
+void decide(Tree** t) {
+    switch (howManyChildren(*t)) {
+        case 0:
+            noChild(t);
+            break;
+        case 1:;
+            oneChild(t);
+            break;                
+        case 2:;
+            twoChild(t);
+            break;            
+        default:
+            break;
+    }
+}
 
 //Required
 void addLeaf(Tree** t, int value) {
@@ -139,6 +170,7 @@ void addLeaf(Tree** t, int value) {
     if ((*t)->value == NULL) {          
         node->level = 0;
         node->side = _HEAD_;
+        node->father = node;
         *t = node;   
     } else {
         if ((*t)->value < value) {
@@ -165,40 +197,13 @@ void addLeaf(Tree** t, int value) {
     }    
 }
 
-void removeTree(Tree** t, int value) {
+void removeNode(Tree** t, int value) {
     if ((*t)->value > value && (*t)->left != NULL) {
         removeTree(&(*t)->left, value);
     } else if((*t)->value < value && (*t)->right != NULL) {
         removeTree(&(*t)->right, value);        
     } else {
-        switch (howManyChildren(*t)) {
-            case 0:
-                free(*t);
-                *t = NULL;
-                break;
-            case 1:;
-                Tree* subs;
-                if ((*t)->left != NULL) {
-                    subs = (*t)->left;
-                } else {
-                    subs = (*t)->right;
-                }
-
-                updateLevel(&subs, _DECREASE_); 
-                Tree* father = (*t)->father;
-                if (father->left == (*t)) {
-                    father->left = subs;
-                } else {
-                    father->right = subs;
-                }                  
-                break;
-                
-            case 2:
-                
-                break;            
-            default:
-                break;
-        }              
+        decide(t);         
     }       
 }
 
@@ -225,7 +230,7 @@ void showTree(Tree* t) {
         return;
     }     
     showTree(t->left);
-    printf("Elemento: %d | Nivel : %d | Tipo de node: %s\n ", t->value, t->level, t->side);
+    printf("Elemento: %d | Nivel : %d | Tipo de node: %s | Elemento Pai: %d\n ", t->value, t->level, t->side, t->father->value);
     showTree(t->right);  
 }
 
