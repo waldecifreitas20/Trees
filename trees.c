@@ -34,22 +34,8 @@ void removeLeaf(Tree** t, int value);
 
 int main() {
     Tree* t = initTree();
-    int r = 0;
     setValues(&t);
    
-   /*  if(!search(t, 198)) {
-        printf("elemento nao encontrado!\n");
-    } */
-   // removeLeaf(&t, 1);
-  //  removeTree(&t, 198);
-   
-    //removeTree(&t, 51);
-    
-  //  maxAndMin(t);
-   
-    showTree(t);
-   // r = howDeepIs(t);
-   // printf("HDI: %d", t->value != NULL);
     return 0;
 }
 
@@ -114,7 +100,6 @@ int howManyChildren(Tree* t) {
 }
 
 Tree* getSubstituteNode(Tree* t) {
-  //  printf("if %d\n", t == NULL);
     if (t->left == NULL)
         return t;
     return getSubstituteNode(t->left);    
