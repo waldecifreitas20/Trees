@@ -5,7 +5,6 @@
 #define _LEFT_ "ESQUERDA"
 #define _RIGHT_ "DIREITA"
 #define _DECREASE_ -1
-#define _INCREASE_ 1
 
 
 typedef struct _tree {
@@ -137,6 +136,8 @@ void oneChild(Tree** t) {
 }
 
 void twoChild(Tree** t) {
+    void decide(Tree** t);
+
     Tree* subs = getSubstituteNode((*t)->right);
     (*t)->value = subs->value;
     decide(&subs);    
@@ -193,6 +194,8 @@ void addLeaf(Tree** t, int value) {
 }
 
 void removeNode(Tree** t, int value) {
+    void decide(Tree** t);
+    
     if ((*t)->value > value && (*t)->left != NULL) {
         removeNode(&(*t)->left, value);
     } else if((*t)->value < value && (*t)->right != NULL) {
