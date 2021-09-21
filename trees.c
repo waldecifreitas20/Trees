@@ -24,7 +24,6 @@ int doubleNode(Tree* t);
 int countLeafs(Tree* t, int value);
 int howDeepIs(Tree* t);
 void maxAndMin(Tree* t);
-void drawTree(Tree* t, int lvl);
 //Aux
 Tree* initTree();
 void setValuesAtTree(Tree** t);
@@ -34,10 +33,10 @@ int main() {
     Tree* t = initTree();
 
     setValuesAtTree(&t);      
-   // removeNode(&t, 61);    
-   // showTree(t);
-   // search(t, 198);
-    drawTree(t, 0);
+    removeNode(&t, 61);    
+    showTree(t);
+    search(t, 198);
+   
     return 0;
 }
 
@@ -60,17 +59,12 @@ Tree* newNode(int value) {
  
 void setValuesAtTree(Tree** t) {
     int i = 0;
-    /* int vet[] = {
+    int vet[] = {
         86, 11, 7, 35, 170, 2, 
         120, 21, 88, 152, 31, 12, 
         181, 28, 134, 70, 1, 85, 
         25, 77, 10, 128, 198
-    }; */
-    int vet[] = {
-        61, 43, 89, 16, 51, 66, 100,
-        11, 32, 55, 79, 90, 77, 82, 83
-    };
-
+    }; 
     for (i = 0; i < sizeof(vet)/sizeof(int); i++) {       
         addLeaf(t, vet[i]);
     }
@@ -162,27 +156,6 @@ void decide(Tree** t) {
         default:
             break;
     }
-}
-
-void addSpaces(float value) {
-    int i;
-    for ( i = 0; i < value; i++)
-        printf(' ');
-}
-
-void printNodeByLevel(Tree* t, int level, int spaces) {
-    if (t->level == level)  {
- 
-       addSpaces(spaces);
-        printf("%d ", t->value);
-    }
-    if (t->left != NULL)  {
-        printNodeByLevel(t->left, level, howDeepIs(t->left));
-    }
-    if (t->right != NULL)  {
-        printNodeByLevel(t->right, level, howDeepIs(t->left));
-    }
-    
 }
 
 //Required
@@ -310,15 +283,4 @@ int howDeepIs(Tree* t) {
 void maxAndMin(Tree* t) {
     printf("Maior valor: %d\n", max(t));
     printf("Menor valor: %d\n", min(t));
-}
-
-void drawTree(Tree* t, int lvl) {
-    int i, len = howDeepIs(t);
-    for (i = 0; i < len; i++) {
-        printNodeByLevel(t, i, len);
-        puts("\n");
-    }
-    
-    
-    
 }
