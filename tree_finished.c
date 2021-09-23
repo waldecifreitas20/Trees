@@ -5,6 +5,7 @@
 #define _LEFT_ "ESQUERDA"
 #define _RIGHT_ "DIREITA"
 #define _DECREASE_ -1
+#define _INIT_ 0
 
 
 typedef struct _tree {
@@ -14,10 +15,10 @@ typedef struct _tree {
 }Tree;
 
 //Required
-void addLeaf(Tree** t, int value);
+int addLeaf(Tree** t, int value);
 int search(Tree* t, int value);
-void removeNode(Tree** t, int value);
-void showTree(Tree* t);
+int removeNode(Tree** t, int value);
+void showTreeInOrder(Tree* t);
 //Extra
 int doubleNode(Tree* t);
 int countLeafs(Tree* t, int value);
@@ -26,16 +27,96 @@ void maxAndMin(Tree* t);
 //Aux
 Tree* initTree();
 void setValuesAtTree(Tree** t);
+void showTree(Tree* t);
+void decide(Tree** t);
 
 
 int main() {
+    //INICIANDO A ARVORE
+    puts("* INICIANDO ARVORE *");
     Tree* t = initTree();
-
-    setValuesAtTree(&t);      
-    removeNode(&t, 61);    
+    puts("* ARVORE INICIADA*\n");
+    
+    //INSERINDO OS VALORES INICIAIS NA ARVORE
+    puts("* INSERINDO VALORES *");
+    setValuesAtTree(&t);    
+    puts("* VALORES INSERIDOS *\n");
+    
+    //APRESENTANDO OS VALORES
     showTree(t);
-    search(t, 198);
+
+    //INSERINDO VALORES NA ARVORE
+    puts("* INSERINDO O VALOR INFORMADO PELO USUARIO *");
+    int value;
+    char response;
+    int success;
+    do {
+        printf("Digite um valor: ");
+        scanf("%d", &value);
+        getchar();
+
+        success = addLeaf(&t, value);
+        if (success == 1) {
+            printf("* VALOR %d INSERIDO COM SUCESSO *\n\n", value);
+        } else {
+            puts("ELEMENTO JA EXISTENTE NA ARVORE!\n");
+        }
+        printf("Deseja adicionar mais um valor?(s/n)\nR: ");
+        scanf("%c", &response);   
+    } while (response == 's');
+    
+    //APRESENTANDO OS VALORES
+    showTree(t);
+    
+    //REMOVENDO O VALORES DA ARVORE
+    do {       
+        puts("\n* REMOVENDO O VALOR INFORMADO PELO USUARIO*");
+
+        printf("Digite um valor: ");
+        scanf("%d",&value);
+        getchar();
+        success = removeNode(&t, value);
+        if (success == 1) {
+            printf("* VALOR %d REMOVIDO COM SUCESSO *\n\n", value);            
+        } else {
+            printf("* %d NAO EXISTE NA ARVORE *\n\n", value);     
+        }        
+        printf("Deseja remover mais um valor?(s/n)\nR: ");
+        scanf("%c", &response); 
+    } while (response == 's');
+     
+    //APRESENTANDO OS VALORES 
+    showTree(t);
    
+    //BUSCANDO O VALOR NA ARVORE
+    do {
+        printf("Buscar pelo valor: ");
+        scanf("%d", &value);
+        getchar();
+        int found = search(t, value);
+        if (found == 0) {
+            printf("* VALOR NAO ENCONTRADO. MOTIVO: %d NAO EXISTE NA ARVORE *\n\n", value);    
+        }
+        printf("Deseja realizar uma nova busca?(s/n)\nR: ");
+        scanf("%c", &response); 
+    } while (response == 's');
+    
+    
+    //BUSCANDO NO COM 2 FILHOS
+    printf("========== INFORMACOES DA ARVORE ==========\n");
+    printf("Total de no's com 2 filhos: %d\n",doubleNode(t));
+    
+    //NuMERO DE FOLHAS
+    printf("Numero de folhas: %d\n",countLeafs(t,_INIT_));
+    
+    //NuMERO DE NiVEIS
+    printf("Numero de niveis: %d\n",howDeepIs(t));
+    
+    //MAIOR E MENOR VALOR
+    maxAndMin(t);
+    printf("===========================================\n");
+    
+    system("pause");
     return 0;
 }
 
@@ -135,9 +216,7 @@ void oneChild(Tree** t) {
     subs->father = father;
 }
 
-void twoChild(Tree** t) {
-    void decide(Tree** t);
-
+void twoChild(Tree** t) {    
     Tree* subs = getSubstituteNode((*t)->right);
     (*t)->value = subs->value;
     decide(&subs);    
@@ -159,9 +238,18 @@ void decide(Tree** t) {
     }
 }
 
+void showTree(Tree* t) {
+    void showTreeInOrder(Tree* t);
+    puts("========================== VALORES DA ARVORE =========================\n");
+    showTreeInOrder(t);
+    puts("======================================================================\n");
+}
+
+
 //Required
-void addLeaf(Tree** t, int value) {
+int addLeaf(Tree** t, int value) {
     Tree* node = newNode(value);
+    int success = 1;
     if ((*t)->value == NULL) {          
         node->level = 0;
         node->side = _HEAD_;
@@ -175,7 +263,7 @@ void addLeaf(Tree** t, int value) {
                 node->father = *t;              
                 (*t)->right = node;
             } else {
-                addLeaf(&(*t)->right, value);
+                success = addLeaf(&(*t)->right, value);
             }           
         } else if ((*t)->value > value) {
             if ((*t)->left == NULL) {
@@ -184,25 +272,27 @@ void addLeaf(Tree** t, int value) {
                 node->father = *t;         
                 (*t)->left = node;
             } else {             
-                addLeaf(&(*t)->left, value);
+                success = addLeaf(&(*t)->left, value);
             }           
         } else {
-            printf("Elemento ja existente na arvore!\n");
+            return 0;
         }
     
     }    
+    return success;
 }
 
-void removeNode(Tree** t, int value) {
-    void decide(Tree** t);
-    
+int removeNode(Tree** t, int value) {
+    int success = 0;
     if ((*t)->value > value && (*t)->left != NULL) {
-        removeNode(&(*t)->left, value);
+        success = removeNode(&(*t)->left, value);
     } else if((*t)->value < value && (*t)->right != NULL) {
-        removeNode(&(*t)->right, value);        
-    } else {
-        decide(t);         
-    }       
+        success = removeNode(&(*t)->right, value);        
+    } else if((*t)->value == value) {
+        decide(t);     
+        success = 1;        
+    }      
+    return success;
 }
 
 int search(Tree* t, int value) {
@@ -212,7 +302,7 @@ int search(Tree* t, int value) {
         printf("    Valor: %d\n", t->value);
         printf("    Nivel: %d\n", t->level);
         printf("    Elemento Pai: %d\n", t->father->value);
-        printf("    Orientacao na subarvore: %s\n\n", t->side);
+        printf("    Orientacao na subavore: %s\n\n", t->side);
         return 1;
     } else {
         if (value < t->value && t->left != NULL) {
@@ -224,14 +314,15 @@ int search(Tree* t, int value) {
     }    
 }
 
-void showTree(Tree* t) {
+void showTreeInOrder(Tree* t) {
     if (t == NULL) {
         return;
     }     
-    showTree(t->left);
+    showTreeInOrder(t->left);
     printf("Elemento: %d | Nivel : %d | Tipo de node: %s | Elemento Pai: %d\n ", t->value, t->level, t->side, t->father->value);
-    showTree(t->right);  
+    showTreeInOrder(t->right);  
 }
+
 
 //Extra
 int doubleNode(Tree* t) {
@@ -252,16 +343,16 @@ int doubleNode(Tree* t) {
     
 }
 
-int countLeafs(Tree* t, int value) {
+int countLeafs(Tree* t, int leafs) {
     if (t->right == NULL && t->left == NULL)
-        return value + 1;
+        return leafs + 1;
 
     int l = 0, r = 0;
     if (t->left != NULL)
-        l = countLeafs(t->left, value);
+        l = countLeafs(t->left, leafs);
 
     if (t->right != NULL)
-        r = countLeafs(t->right, value);
+        r = countLeafs(t->right, leafs);
     
     return r + l;    
 }
@@ -275,7 +366,7 @@ int howDeepIs(Tree* t) {
         ++l1;
      
     if (t->right != NULL) 
-        ++l2;
+        ++l2; 
 
     l1 += howDeepIs(t->left);
     l2 += howDeepIs(t->right);
